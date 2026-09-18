@@ -94,5 +94,5 @@ template_projects:
   external_files: []
   project_description: ''
   project_name: hc32f334_template
-  project_type: rt-thread|@full|@5.2.2
+  project_type: rt-thread|@full|@5.3.0
 yaml_version: 3

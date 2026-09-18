@@ -68,6 +68,7 @@ static struct lwp_avl_struct *lwp_pid_free_head = RT_NULL;
 static int lwp_pid_ary_alloced = 0;
 static struct lwp_avl_struct *lwp_pid_root = RT_NULL;
 static pid_t current_pid = 0;
+static unsigned long lwp_create_count = 0;
 static struct rt_mutex pid_mtx;
 static struct rt_wqueue _pid_emptyq;
 
@@ -164,6 +165,28 @@ static int _before_cb(struct lwp_avl_struct *node, void *data)
     struct pid_foreach_param *param = data;
     pid_t pid = node->avl_key;
     return param->cb(pid, param->data);
+}
+
+unsigned long lwp_pid_get_create_count(void)
+{
+    unsigned long count;
+
+    lwp_pid_lock_take();
+    count = lwp_create_count;
+    lwp_pid_lock_release();
+
+    return count;
+}
+
+pid_t lwp_pid_get_last(void)
+{
+    pid_t pid;
+
+    lwp_pid_lock_take();
+    pid = current_pid;
+    lwp_pid_lock_release();
+
+    return pid;
 }
 
 /**
@@ -336,6 +359,35 @@ void lwp_pid_put(struct rt_lwp *lwp)
 }
 
 /**
+ * @brief Roll back a PID allocated for a process that never became runnable.
+ *
+ * @param[in,out] lwp The lightweight process whose PID allocation should be
+ *                    undone. The LWP must have been allocated a PID, but must
+ *                    not have been made visible as a runnable user task.
+ *
+ * @note This helper is intended for exec/spawn failure paths after PID
+ *       allocation and before task startup. It removes the PID table entry,
+ *       clears lwp->pid, and drops the initial LWP reference.
+ *
+ *       Do not use lwp_pid_put() for this case. lwp_pid_put() has process-exit
+ *       semantics: when the PID tree becomes empty it wakes waiters and keeps
+ *       the PID lock held to prevent new PID allocation. A failed exec rollback
+ *       must release the PID lock unconditionally so later LWP launches can
+ *       still allocate PIDs, especially in init-less boot flows.
+ */
+void lwp_pid_rollback(struct rt_lwp *lwp)
+{
+    _free_proc_dentry(lwp);
+
+    lwp_pid_lock_take();
+    lwp_pid_put_locked(lwp->pid);
+    lwp_pid_lock_release();
+
+    lwp->pid = 0;
+    lwp_ref_dec(lwp);
+}
+
+/**
  * @brief Set the LWP for a given PID while holding the PID lock
  *
  * @param[in] pid The process ID to set the LWP for
@@ -384,8 +436,7 @@ static void __exit_files(struct rt_lwp *lwp)
         d = lwp->fdt.fds[fd];
         if (d)
         {
-            dfs_file_close(d);
-            fdt_fd_release(&lwp->fdt, fd);
+            dfs_fdtable_drop_fd(&lwp->fdt, fd);
         }
         fd--;
     }
@@ -666,6 +717,7 @@ rt_lwp_t lwp_create(rt_base_t flags)
             {
                 new_lwp->pid = pid;
                 lwp_pid_set_lwp_locked(pid, new_lwp);
+                lwp_create_count++;
             }
             lwp_pid_lock_release();
         }
