@@ -198,7 +198,7 @@ def PrepareBuilding(env, root_directory, has_libcpu=False, remove_components = [
     Env['BSP_ROOT'] = Dir('#').abspath
     os.environ["BSP_DIR"] = Dir('#').abspath
 
-    sys.path += os.path.join(Rtt_Root, 'tools')
+    sys.path.append(os.path.join(Rtt_Root, 'tools'))
 
     # {target_name:(CROSS_TOOL, PLATFORM)}
     tgt_dict = {'mdk':('keil', 'armcc'),

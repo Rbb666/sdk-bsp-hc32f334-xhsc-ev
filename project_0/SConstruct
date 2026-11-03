@@ -2,16 +2,8 @@ import os
 import sys
 import rtconfig
 
-if os.getenv('RTT_ROOT'):
-    RTT_ROOT = os.getenv('RTT_ROOT')
-else:
-    RTT_ROOT = os.path.normpath(os.getcwd() + '/../../..')
-
-# set RTT_ROOT
-if not os.getenv("RTT_ROOT"):
-    RTT_ROOT = "rt-thread"
-
-sys.path = sys.path + [os.path.join(RTT_ROOT, 'tools')]
+RTT_ROOT = os.path.abspath(os.getenv("RTT_ROOT") or "rt-thread")
+sys.path.insert(0, os.path.join(RTT_ROOT, "tools"))
 try:
     from building import *
 except:
