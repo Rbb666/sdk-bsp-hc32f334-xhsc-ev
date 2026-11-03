@@ -55,7 +55,7 @@ features_zh:
 - 数据加密，AES/HASH.TRNG
 pkg_type: Board_Support_Packages
 pkg_vendor: XHSC
-pkg_version: 1.0.0
+pkg_version: 1.0.2
 template_projects:
 - builtin_files:
   - files_and_folders:
@@ -71,6 +71,7 @@ template_projects:
     - jlink
     - Kconfig
     - platform
+    - packages
     - libraries
     - makefile.targets
     - project.ewd

@@ -1,0 +1,43 @@
+{
+  "format_version": 1,
+  "description": "Offline dependency source snapshots for HC32F334 BSP. Keep directory names compatible with the template's package configuration.",
+  "packages": [
+    {
+      "name": "hc32-f3-cmsis",
+      "directory": "hc32-f3-cmsis-latest",
+      "repository": "https://github.com/RT-Thread-packages/hc32-f3-cmsis",
+      "commit": "04c244b794401cede69c66c68acd5ecdbfe23027",
+      "archive_sha256": "97783fcfd96f367246a4c1f879e9725d9cce791589c1b89d33a59cbdc4cdd989",
+      "licenses": [
+        "Apache-2.0 (Arm CMSIS headers, see source file notices)",
+        "BSD-3-Clause (XHSC device headers/startup/system sources, see source file notices)"
+      ]
+    },
+    {
+      "name": "hc32-f3-series",
+      "directory": "hc32-f3-series-latest",
+      "repository": "https://github.com/RT-Thread-packages/hc32-f3-series",
+      "commit": "d807712b75fb8bc6e0af6557849eaf953ff55d7b",
+      "licenses": [
+        "BSD-3-Clause (hc32f334/LICENSE)"
+      ],
+      "archive_sha256": "da65354e78dcfebaa7cc862fadf3f1cd16c08bba5561a9125aaa9ca019c990c9"
+    }
+  ],
+  "kconfig_sources": [
+    {
+      "repository": "https://github.com/RT-Thread/packages",
+      "path": "peripherals/hal-sdk/hc32/hc32-f3-cmsis/Kconfig",
+      "blob_sha": "9d1345e3f5ecd586cce9521999f5df04bdfa90d1"
+    },
+    {
+      "repository": "https://github.com/RT-Thread/packages",
+      "path": "peripherals/hal-sdk/hc32/hc32-f3-series/Kconfig",
+      "blob_sha": "21d9b3a0796fc724fbce45b06cca55d810c7d7a5"
+    }
+  ],
+  "license_texts": [
+    "licenses/Apache-2.0.txt",
+    "licenses/BSD-3-Clause-XHSC.txt"
+  ]
+}
