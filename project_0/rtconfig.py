@@ -1,4 +1,5 @@
 import os
+import shutil
 
 # toolchains options
 ARCH='arm'
@@ -20,7 +21,10 @@ if  CROSS_TOOL == 'gcc':
     if os.getenv('RTT_EXEC_PATH'):
         EXEC_PATH = os.getenv('RTT_EXEC_PATH')
     else:
-        EXEC_PATH   = r'C:/Users/XXYYZZ'
+        # Use the compiler available to the build, including headless Linux CI.
+        # SCons needs its directory to detect newlib and generate libc options.
+        compiler = shutil.which('arm-none-eabi-gcc')
+        EXEC_PATH = os.path.dirname(compiler) if compiler else r'C:/Users/XXYYZZ'
 elif CROSS_TOOL == 'keil':
     PLATFORM    = 'armcc'
     EXEC_PATH   = r'C:/Keil_v5'
